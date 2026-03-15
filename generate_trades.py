@@ -19,10 +19,7 @@ if "Close" not in signals.columns:
 signals = signals.dropna(subset=["Close"])
 
 trades = []
-for index, row in signals.iterrows():
-    entry = row["Close"]
-    trade = {
-        "ticker": "TSLA",
+col1.metric("آخر سعر", f"${data['Close'].iloc[-1]:.2f}")
         "entry": round(entry, 2),
         "tp1": round(entry * 1.05, 2),
         "tp2": round(entry * 1.10, 2),
