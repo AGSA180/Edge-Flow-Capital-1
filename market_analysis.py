@@ -1,19 +1,20 @@
-import streamlit as st
+import yfinance as yf
 import pandas as pd
-import os
+from datetime import datetime
 
-st.title("Edge Flow Capital Dashboard")
+# تحميل بيانات TSLA
+data = yf.download("TSLA", period="5d", interval="1h")
 
-# إنشاء الملف إذا ما كان موجوداً
-if not os.path.exists("signals.csv"):
-    df_empty = pd.DataFrame(columns=[
-        'symbol', 'signal', 'price', 'timestamp', 'confidence'
-    ])
-    df_empty.to_csv("signals.csv", index=False)
-    st.warning("⚠️ لا توجد إشارات حتى الآن — في انتظار التحليل.")
-else:
-    data = pd.read_csv("signals.csv")
-    if data.empty:
-        st.info("📭 الملف موجود لكن لا توجد إشارات بعد.")
-    else:
-        st.dataframe(data)
+# تسوية الأعمدة
+data.columns = [col[0] if isinstance(col, tuple) else col for col in data.columns]
+
+# إضافة معلومات الإشارة
+data["symbol"] = "TSLA"
+data["signal"] = "HOLD"
+data["signal_strength"] = 80
+data["timestamp"] = datetime.now().strftime("%Y-%m-%d %H:%M")
+
+# حفظ البيانات
+data.to_csv("signals.csv", index=True)
+print("✅ Market analysis completed")
+print(f"📊 Rows saved: {len(data)}")
