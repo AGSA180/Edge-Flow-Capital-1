@@ -1,0 +1,29 @@
+name: Edge Flow Capital Agent
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+jobs:
+  run-agent:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install Libraries
+        run: |
+          pip install yfinance pandas requests streamlit
+
+      - name: Run Market Analysis
+        run: python market_analysis.py
+
+      - name: Run Trade Generator
+        run: python generate_trades.py
