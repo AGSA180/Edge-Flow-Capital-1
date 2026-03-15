@@ -1,9 +1,9 @@
 name: Edge Flow Capital Agent
 
 on:
-  schedule:
-    - cron: "*/30 * * * *"
   workflow_dispatch:
+  schedule:
+    - cron: '0 14 * * 1-5'
 
 jobs:
   run-agent:
@@ -11,19 +11,29 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: '3.11'
 
       - name: Install Libraries
-        run: |
-          pip install yfinance pandas requests streamlit
+        run: pip install -r requirements.txt
 
       - name: Run Market Analysis
         run: python market_analysis.py
 
       - name: Run Trade Generator
-        run: python generate_trades.py
+        run: python trade_generator.py
+
+      - name: Save Results to Repo
+        run: |
+          git config --global user.name "EdgeFlow Bot"
+          git config --global user.email "bot@edgeflow.com"
+          git add signals.csv trades.csv
+          git diff --staged --quiet || git commit -m "📊 Auto-update: $(date +'%Y-%m-%d %H:%M')"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
