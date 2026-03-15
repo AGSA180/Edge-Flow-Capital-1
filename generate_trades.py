@@ -1,39 +1,23 @@
+import streamlit as st
 import pandas as pd
 import os
-from datetime import datetime
 
-# قراءة الإشارات
+st.set_page_config(page_title="Edge Flow Capital", layout="wide")
+st.title("📊 Edge Flow Capital — Dashboard")
+
 if not os.path.exists("signals.csv"):
-    print("❌ signals.csv not found")
-    exit(1)
+    st.warning("⚠️ لا توجد بيانات — شغّل GitHub Actions أولاً.")
+    st.stop()
 
-signals = pd.read_csv("signals.csv")
+data = pd.read_csv("signals.csv")
+data.columns = [str(col).split(",")[0].strip("('\" ") for col in data.columns]
 
-# التحقق من عمود Close
-if "Close" not in signals.columns:
-    print("❌ Column 'Close' not found")
-    print("Available columns:", signals.columns.tolist())
-    exit(1)
+if "Close" not in data.columns:
+    st.error(f"❌ أعمدة الملف: {data.columns.tolist()}")
+    st.stop()
 
-# إزالة الصفوف الفارغة
-signals = signals.dropna(subset=["Close"])
+data = data.dropna(subset=["
 
-trades = []
-col1.metric("آخر سعر", f"${data['Close'].iloc[-1]:.2f}")
-        "entry": round(entry, 2),
-        "tp1": round(entry * 1.05, 2),
-        "tp2": round(entry * 1.10, 2),
-        "tp3": round(entry * 1.15, 2),
-        "stop": round(entry * 0.97, 2),
-        "signal_strength": row.get("signal_strength", 0),
-        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M")
-    }
-    trades.append(trade)
 
-# حفظ الصفقات
-trades_df = pd.DataFrame(trades)
-trades_df.to_csv("trades.csv", index=False)
 
-print(f"✅ Trade generation completed")
-print(f"📈 Total trades: {len(trades)}")
-print(trades_df.head())
+
