@@ -8,7 +8,7 @@ if not os.path.exists("signals.csv"):
 
 signals = pd.read_csv("signals.csv")
 
-# تحديد عمود السعر تلقائياً
+# البحث عن عمود السعر
 price_col = None
 for col in ['Close', 'close', 'price', 'Price']:
     if col in signals.columns:
@@ -32,16 +32,12 @@ for _, row in signals.iterrows():
         "tp2":             round(entry * 1.10, 2),
         "tp3":             round(entry * 1.15, 2),
         "stop":            round(entry * 0.97, 2),
-        "signal_strength": row.get("signal_strength", 80),
+        "signal_strength": 80,
         "timestamp":       datetime.now().strftime("%Y-%m-%d %H:%M")
     })
 
-import pandas as pd
 trades_df = pd.DataFrame(trades)
 trades_df.to_csv("trades.csv", index=False)
-
 print(f"✅ Trade generation completed")
 print(f"📈 Total trades: {len(trades)}")
-
-
 
