@@ -1,23 +1,47 @@
-import streamlit as st
 import pandas as pd
 import os
-
-st.set_page_config(page_title="Edge Flow Capital", layout="wide")
-st.title("📊 Edge Flow Capital — Dashboard")
+from datetime import datetime
 
 if not os.path.exists("signals.csv"):
-    st.warning("⚠️ لا توجد بيانات — شغّل GitHub Actions أولاً.")
-    st.stop()
+    print("❌ signals.csv not found")
+    exit(1)
 
-data = pd.read_csv("signals.csv")
-data.columns = [str(col).split(",")[0].strip("('\" ") for col in data.columns]
+signals = pd.read_csv("signals.csv")
 
-if "Close" not in data.columns:
-    st.error(f"❌ أعمدة الملف: {data.columns.tolist()}")
-    st.stop()
+# تحديد عمود السعر تلقائياً
+price_col = None
+for col in ['Close', 'close', 'price', 'Price']:
+    if col in signals.columns:
+        price_col = col
+        break
 
-data = data.dropna(subset=["
+if price_col is None:
+    print(f"❌ Column 'Close' not found")
+    print(f"Available columns: {signals.columns.tolist()}")
+    exit(1)
 
+signals = signals.dropna(subset=[price_col])
+
+trades = []
+for _, row in signals.iterrows():
+    entry = float(row[price_col])
+    trades.append({
+        "ticker":          "TSLA",
+        "entry":           round(entry, 2),
+        "tp1":             round(entry * 1.05, 2),
+        "tp2":             round(entry * 1.10, 2),
+        "tp3":             round(entry * 1.15, 2),
+        "stop":            round(entry * 0.97, 2),
+        "signal_strength": row.get("signal_strength", 80),
+        "timestamp":       datetime.now().strftime("%Y-%m-%d %H:%M")
+    })
+
+import pandas as pd
+trades_df = pd.DataFrame(trades)
+trades_df.to_csv("trades.csv", index=False)
+
+print(f"✅ Trade generation completed")
+print(f"📈 Total trades: {len(trades)}")
 
 
 
